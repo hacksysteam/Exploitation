@@ -1,0 +1,148 @@
+Trigger Crash Analysis
+=======================
+
+1. Get the status of Global Flags (Page Heaps)
+----------------------------------------------
+0:016> !gflag
+Current NtGlobalFlag contents: 0x02000100
+    vrf - Enable application verifier
+    hpa - Place heap allocations at ends of pages
+----------------------------------------------
+
+2. Crash Log and Stack Trace
+----------------------------------------------
+(860.83c): Access violation - code c0000005 (first chance)
+First chance exceptions are reported before any exception handling.
+This exception may be expected and handled.
+eax=0000c0c0 ebx=00000005 ecx=00000000 edx=00000006 esi=0acaf000 edi=0000002c
+eip=64a205d4 esp=05c3b128 ebp=05c3b144 iopl=0         nv up ei pl nz na pe nc
+cs=001b  ss=0023  ds=0023  es=0023  fs=003b  gs=0000             efl=00010206
+MSHTML!CDOMStringDataList::InitFromString+0x4b:
+64a205d4 0fb706          movzx   eax,word ptr [esi]       ds:0023:0acaf000=????
+
+
+0:007> kn
+ # ChildEBP RetAddr  
+00 05c3b144 64a1c57f MSHTML!CDOMStringDataList::InitFromString+0x4b
+01 05c3b168 649d53ee MSHTML!CSVGStringList::FromString+0x55
+02 05c3b188 649d81a1 MSHTML!CSVGHelpers::SetAttributeStringAndList<CDOMStringDataList,CSVGStringList>+0x81
+03 05c3b198 6423235a MSHTML!CSVGElement::SetRequiredFeaturesHelper+0x21
+04 05c3b1f8 64283272 MSHTML!PROPERTYDESC::HandleStringProperty+0x110
+05 05c3b224 63d75871 MSHTML!`CBackgroundInfo::Property<CBackgroundImage>'::`7'::`dynamic atexit destructor for 'fieldDefaultValue''+0x4686
+06 05c3b264 63d757c3 MSHTML!CElement::SetAttributeFromPropDesc+0xbe
+07 05c3b3a0 64124301 MSHTML!CElement::ie9_setAttributeNSInternal+0x3b0
+08 05c3b3d8 6453d0fb MSHTML!CElement::setAttributeNS_Helper+0x69
+09 05c3b440 64855d9c MSHTML!CElement::Var_setAttributeNS+0x14a
+0a 05c3b468 66800fb6 MSHTML!CFastDOM::CElement::Trampoline_setAttributeNS+0x3c
+0b 05c3b4e0 667fed52 jscript9!Js::JavascriptExternalFunction::ExternalFunctionThunk+0x18e
+0c 05c3b798 667ff499 jscript9!Js::InterpreterStackFrame::Process+0x1e72
+0d 05c3b8c4 063d0fd9 jscript9!Js::InterpreterStackFrame::InterpreterThunk<1>+0x200
+WARNING: Frame IP not in any known module. Following frames may be wrong.
+0e 05c3b8d0 667fed52 0x63d0fd9
+0f 05c3bb78 667ff499 jscript9!Js::InterpreterStackFrame::Process+0x1e72
+10 05c3bc9c 063d0fe1 jscript9!Js::InterpreterStackFrame::InterpreterThunk<1>+0x200
+11 05c3bca8 667f825f 0x63d0fe1
+12 05c3bcf4 667f8928 jscript9!Js::JavascriptFunction::CallFunction<1>+0x91
+13 05c3bd68 667f885d jscript9!Js::JavascriptFunction::CallRootFunction+0xb9
+14 05c3bdb0 667f87f0 jscript9!ScriptSite::CallRootFunction+0x42
+15 05c3bdfc 6699b8b1 jscript9!ScriptSite::Execute+0xd2
+16 05c3be60 63d6201c jscript9!ScriptEngineBase::Execute+0xc8
+17 05c3bf1c 63d61eb6 MSHTML!CListenerDispatch::InvokeVar+0x15a
+18 05c3bf48 63d61ba2 MSHTML!CListenerDispatch::Invoke+0x6d
+19 05c3bfe8 63d61d16 MSHTML!CEventMgr::_InvokeListeners+0x210
+1a 05c3c000 63d61c33 MSHTML!CEventMgr::_InvokeListenersOnWindow+0x42
+1b 05c3c090 63d619c4 MSHTML!CEventMgr::_InvokeListeners+0x150
+1c 05c3c1f0 63c31195 MSHTML!CEventMgr::Dispatch+0x4d5
+1d 05c3c218 6422e334 MSHTML!CEventMgr::DispatchEvent+0x90
+1e 05c3c250 63c5283a MSHTML!COmWindowProxy::Fire_onload+0x146
+1f 05c3c2b0 63c5248a MSHTML!CMarkup::OnLoadStatusDone+0x373
+20 05c3c2c4 63c5158f MSHTML!CMarkup::OnLoadStatus+0xe7
+21 05c3c708 63c41522 MSHTML!CProgSink::DoUpdate+0x48b
+22 05c3c714 63b8e1b3 MSHTML!CProgSink::OnMethodCall+0x12
+23 05c3c75c 63b7577e MSHTML!GlobalWndOnMethodCall+0x17b
+24 05c3c7b0 76adc4e7 MSHTML!GlobalWndProc+0x12e
+25 05c3c7dc 76adc5e7 user32!InternalCallWinProc+0x23
+26 05c3c854 76adcc19 user32!UserCallWinProcCheckWow+0x14b
+27 05c3c8b4 76adcc70 user32!DispatchMessageWorker+0x35e
+28 05c3c8c4 6ddaa7b8 user32!DispatchMessageW+0xf
+29 05c3fa90 6dde8de8 IEFRAME!CTabWindow::_TabWindowThreadProc+0x464
+2a 05c3fb50 75a9e81c IEFRAME!LCIETab_ThreadProc+0x3e7
+2b 05c3fb68 6ea94b01 iertutil!CMemBlockRegistrar::_LoadProcs+0x67
+2c 05c3fba0 76d3ee1c IEShims!NS_CreateThread::DesktopIE_ThreadProc+0x94
+2d 05c3fbac 770f37eb kernel32!BaseThreadInitThunk+0xe
+2e 05c3fbec 770f37be ntdll!__RtlUserThreadStart+0x70
+2f 05c3fc04 00000000 ntdll!_RtlUserThreadStart+0x1b
+----------------------------------------------
+
+3. View content of ESI register
+----------------------------------------------
+0:007> dc @esi
+0acaf000  ???????? ???????? ???????? ????????  ????????????????
+0acaf010  ???????? ???????? ???????? ????????  ????????????????
+0acaf020  ???????? ???????? ???????? ????????  ????????????????
+0acaf030  ???????? ???????? ???????? ????????  ????????????????
+0acaf040  ???????? ???????? ???????? ????????  ????????????????
+0acaf050  ???????? ???????? ???????? ????????  ????????????????
+0acaf060  ???????? ???????? ???????? ????????  ????????????????
+0acaf070  ???????? ???????? ???????? ????????  ????????????????
+----------------------------------------------
+
+4. View the allocation Stack Trace
+----------------------------------------------
+0:007> !heap -p -a @esi
+    address 0acaf000 found in
+    _DPH_HEAP_ROOT @ 1281000
+    in busy allocation (  DPH_HEAP_BLOCK:         UserAddr         UserSize -         VirtAddr         VirtSize)
+                                 ad4057c:          acaeff0               10 -          acae000             2000
+    6ec38e89 verifier!AVrfDebugPageHeapAllocate+0x00000229
+    77155ede ntdll!RtlDebugAllocateHeap+0x00000030
+    7711a40a ntdll!RtlpAllocateHeap+0x000000c4
+    770e5ae0 ntdll!RtlAllocateHeap+0x0000023a
+    757dea43 ole32!CRetailMalloc_Alloc+0x00000016
+    76e54557 OLEAUT32!APP_DATA::AllocCachedMem+0x00000060
+    76e5476a OLEAUT32!SysAllocStringByteLen+0x0000003d
+    76e547bf OLEAUT32!ErrStringCopyNoNull+0x00000016
+    76e55dda OLEAUT32!VariantChangeTypeEx+0x00000a19
+    63c771b6 MSHTML!VariantChangeTypeSpecial+0x00000093
+    63d7581c MSHTML!CElement::SetAttributeFromPropDesc+0x00000069
+    63d757c3 MSHTML!CElement::ie9_setAttributeNSInternal+0x000003b0
+    64124301 MSHTML!CElement::setAttributeNS_Helper+0x00000069
+    6453d0fb MSHTML!CElement::Var_setAttributeNS+0x0000014a
+    64855d9c MSHTML!CFastDOM::CElement::Trampoline_setAttributeNS+0x0000003c
+    66800fb6 jscript9!Js::JavascriptExternalFunction::ExternalFunctionThunk+0x0000018e
+    667fed52 jscript9!Js::InterpreterStackFrame::Process+0x00001e72
+    667ff499 jscript9!Js::InterpreterStackFrame::InterpreterThunk<1>+0x00000200
+
+
+0:007> dc acaeff0
+0acaeff0  00000002 0000000a c0c0c0c0 c0c0c0c0  ................
+0acaf000  ???????? ???????? ???????? ????????  ????????????????
+0acaf010  ???????? ???????? ???????? ????????  ????????????????
+0acaf020  ???????? ???????? ???????? ????????  ????????????????
+0acaf030  ???????? ???????? ???????? ????????  ????????????????
+0acaf040  ???????? ???????? ???????? ????????  ????????????????
+0acaf050  ???????? ???????? ???????? ????????  ????????????????
+0acaf060  ???????? ???????? ???????? ????????  ????????????????
+
+
+Note: 0000000a = "\n"
+
+From the allocation we see that the allocation was done by 
+ole32!CRetailMalloc_Alloc which uses OLEAUT32 Cache Heap
+----------------------------------------------
+
+5. Find in which Heap this string has been allocated
+----------------------------------------------
+0:007> !heap -p -h poi(mshtml!g_hProcessHeap)
+    _DPH_HEAP_ROOT @ 1281000
+    Freed and decommitted blocks
+      DPH_HEAP_BLOCK : VirtAddr VirtSize
+        09b72000 : 05378000 00002000
+        <snip>
+        0ad4057c : 0acaeff0 00000010 - 0acae000 00002000
+        <snip>
+
+
+Note: We can see that DPH_HEAP_ROOT @ 1281000 belongs to
+Process Heap
+----------------------------------------------

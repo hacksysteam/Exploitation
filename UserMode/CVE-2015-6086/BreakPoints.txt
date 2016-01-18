@@ -1,0 +1,44 @@
+Heap Handles
+=============
+?poi(ole32!g_hHeap)
+?poi(MSHTML!g_hProcessHeap)
+?poi(MSHTML!g_hIsolatedHeap)
+
+
+View Isolated and Process Heap Segment Details
+==============================================
+!heap -p -h poi(MSHTML!g_hIsolatedHeap)
+!heap -p -h poi(MSHTML!g_hProcessHeap)
+
+
+Javascript Logging
+===================
+Math.atan2(0xdeadbeef, "Log: This is a test message");
+bp jscript9!Js::Math::Atan2 ".printf \"Log: %mu\", poi(poi(esp+14)+0c);.echo;gc"
+
+
+Record Heap Allocation Windows 7 SP1 x86
+=========================================
+bp !ntdll+00052ebc ".printf \"Allocation: %p Size: 0x%x\", @eax, poi(@esp+0c);.echo;gc"
+
+
+Record Heap Frees Windows 7 SP1 x86
+====================================
+bp ntdll!RtlFreeHeap ".printf \"Free @ %p\", poi(@esp+0c);.echo;gc"
+
+
+Record Allocations MsGestureEvent
+=================================
+bp MSHTML!CDOMMSGestureEvent::Create+0x24 ".printf \"MsGestureEvent @ %p\", @eax;.echo;gc"
+
+
+Misc
+=================================
+bp jscript9!Js::Math::Atan2 ".printf \"Log: %mu\", poi(poi(esp+14)+0c);.echo;gc"
+bp MSHTML!CDOMMSGestureEvent::Create+0x24 ".printf \"MsGestureEvent @ %p\", @eax;.echo;gc"
+bp ntdll!RtlFreeHeap ".printf \"Free @ %p\", poi(@esp+0c);.echo;gc"
+bp MSHTML!CDOMStringDataList::InitFromString
+bp jscript9!Js::Math::Atan2 ".printf \"Log: %mu\", poi(poi(esp+14)+0c);.echo;!heap -flts 0x0a0;.echo;gc"
+bp jscript9!Js::Math::Atan2 ".printf \"Log: %mu\", poi(poi(esp+14)+0c);.echo;"
+bp MSHTML!CDOMStringDataList::InitFromString ".printf \"InitFromString ESI: %p\", @esi-8;.echo;gc;"
+

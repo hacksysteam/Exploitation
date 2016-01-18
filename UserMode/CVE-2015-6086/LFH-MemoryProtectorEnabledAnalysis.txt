@@ -1,0 +1,127 @@
+Low Fragmentation Heap Analysis - Memory Protector Enabled
+==========================================================
+
+1. Now run LFH-MemoryProtectorDisabled.html again with Memory Protector Enabled
+-------------------------------------------------------------------------------
+Log: Creating MsGestureEvent
+Free @ 02172a48
+Free @ 02173430
+MsGestureEvent @ 03a1e648
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1e6f0
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1e798
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1e840
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1e8e8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1e990
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1ea38
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1eae0
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1eb88
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1ec30
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1ecd8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1ed80
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1ee28
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1eed0
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1ef78
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1f020
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1f0c8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03a1f170
+Log: Creating MsGestureEvent Count
+Log: Creating MsGestureEvent Completed
+Log: Destroying MsGestureEvent
+Log: Destroying MsGestureEvent Count
+Log: Collecting Garbage
+Free @ 02178668
+Log: Collecting Garbage Completed
+Log: Destroying MsGestureEvent Completed
+Log: Reallocating MsGestureEvent
+MsGestureEvent @ 03a1f218
+Log: Reallocating MsGestureEvent Count
+Log: Reallocating MsGestureEvent Completed
+<snip>
+Free @ 03a1f0c8
+<snip>
+
+
+Note: As we can see that 03a1f0c8 was not freed as soon as we deleted the object,
+instead, it was freed much later after the completion of the execution of our code.
+-------------------------------------------------------------------------------
+
+
+2. Now run LFH-MemoryProtectorEnabled.html again with Memory Protector Enabled
+------------------------------------------------------------------------------
+<snip>
+Log: Creating MsGestureEvent
+Free @ 026d2a48
+Free @ 026d3430
+MsGestureEvent @ 03af6720
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af67c8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af6a68
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af6b10
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af6bb8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af6c60
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af6d08
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af6db0
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af6e58
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af6f00
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af6fa8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af7050
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af70f8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af71a0
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af7248
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af72f0
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af7398
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03af7440
+Log: Creating MsGestureEvent Count
+Log: Creating MsGestureEvent Completed
+Log: Destroying MsGestureEvent
+Log: Destroying MsGestureEvent Count
+Log: Collecting Garbage
+<snip>
+Free @ 03af8c48
+Free @ 03af7398
+<snip>
+Log: Collecting Garbage Completed
+Log: Destroying MsGestureEvent Completed
+Log: Reallocating MsGestureEvent
+MsGestureEvent @ 03af7398
+Log: Reallocating MsGestureEvent Count
+Log: Reallocating MsGestureEvent Completed
+<snip>
+
+Note: As we can see that 03af7398 was freed even Memory Protector was enabled and
+we successfully re-allocated the freed memory.
+------------------------------------------------------------------------------
+

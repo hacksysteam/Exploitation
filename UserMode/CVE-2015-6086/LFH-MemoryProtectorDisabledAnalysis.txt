@@ -1,0 +1,150 @@
+Low Fragmentation Heap Analysis - Memory Protector Disabled
+===========================================================
+
+1. MsGestureEvent is allocated by CDOMMSGestureEvent::Create
+------------------------------------------------------------
+MSHTML!CDOMMSGestureEvent::Create+0x10:
+660b27d6 68a0000000      push    0A0h
+660b27db 6a08            push    8
+660b27dd ff35d8c06666    push    dword ptr [MSHTML!g_hProcessHeap (6666c0d8)]
+660b27e3 8933            mov     dword ptr [ebx],esi
+660b27e5 e8c4a84eff      call    MSHTML!HeapAlloc (6559d0ae)
+660b27ea 8bf8            mov     edi,eax
+660b27ec 85ff            test    edi,edi
+660b27ee 7415            je      MSHTML!CDOMMSGestureEvent::Create+0x3f (660b2805)
+
+
+Note: We can either breakpoint on (mov edi,eax) and print the 
+allocated memory address or use standard Heap tracing.
+------------------------------------------------------------
+
+2. Print the Memory Address allocated by MsGestureEvent (Only allocate once)
+----------------------------------------------------------------------------
+bp MSHTML!CDOMMSGestureEvent::Create+0x24 ".printf \"MsGestureEvent @ %p\", @eax;.echo;gc"
+
+0:019> bp MSHTML!CDOMMSGestureEvent::Create+0x24 ".printf \"MsGestureEvent @ %p\", @eax;.echo;!heap -p -a @eax;!heap -x @eax;gc"
+
+MsGestureEvent @ 03a05660
+    address 03a05660 found in
+    _HEAP @ 350000
+      HEAP_ENTRY Size Prev Flags    UserPtr UserSize - state
+        03a05658 0015 0000  [00]   03a05660    000a0 - (busy)
+
+ 
+Entry     User      Heap      Segment       Size  PrevSize  Unused    Flags
+-----------------------------------------------------------------------------
+03a05658  03a05660  00350000  003fdeb0        a8      -            8  LFH;busy
+
+Note: We can see that LFH is enabled for allocation size 0x0a8 (0x0a0 size of object) + 8 byte heap header
+----------------------------------------------------------------------------
+
+
+3. Find address of g_hProcessHeap before executing our code
+-------------------------------------------------------------------------------
+0:005> ?poi(mshtml!g_hProcessHeap)
+Evaluate expression: 3866624 = 003b0000
+-------------------------------------------------------------------------------
+
+
+4. Now print out the allocated & free heap chunks of the g_hProcessHeap before executing our code
+-------------------------------------------------------------------------------------------------
+0:022> !heap -flt s 0x0a0
+    _HEAP @ 3b0000
+      HEAP_ENTRY Size Prev Flags    UserPtr UserSize - state
+        <snip>
+        03c7f0e8 0015 0015  [00]   03c7f0f0    000a0 - (free)
+        03c7f190 0015 0015  [00]   03c7f198    000a0 - (free)
+        03c7f238 0015 0015  [00]   03c7f240    000a0 - (free)
+        03c7f2e0 0015 0015  [00]   03c7f2e8    000a0 - (free)
+        <snip>
+        03c7f430 0015 0015  [00]   03c7f438    000a0 - (free)
+        03c7f4d8 0015 0015  [00]   03c7f4e0    000a0 - (free)
+        03c7f580 0015 0015  [00]   03c7f588    000a0 - (free)
+        03c7f628 0015 0015  [00]   03c7f630    000a0 - (free)
+        03c7f6d0 0015 0015  [00]   03c7f6d8    000a0 - (free)
+        03c7f778 0015 0015  [00]   03c7f780    000a0 - (free)
+        03c7f820 0015 0015  [00]   03c7f828    000a0 - (free)
+        03c7f8c8 0015 0015  [00]   03c7f8d0    000a0 - (free)
+        03c7f970 0015 0015  [00]   03c7f978    000a0 - (free)
+        03c7fa18 0015 0015  [00]   03c7fa20    000a0 - (free)
+        03c7fac0 0015 0015  [00]   03c7fac8    000a0 - (free)
+        03c7fb68 0015 0015  [00]   03c7fb70    000a0 - (free)
+        03c7fc10 0015 0015  [00]   03c7fc18    000a0 - (free)
+        03c7fcb8 0015 0015  [00]   03c7fcc0    000a0 - (free)
+        <snip>
+-------------------------------------------------------------------------------------------------
+
+5. Execute the LFH code and print the allocation and free
+---------------------------------------------------------
+Log: Creating MsGestureEvent
+Free @ 027f2638
+Free @ 027f3020
+MsGestureEvent @ 03c7f2e8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f240
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f0f0
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f198
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f438
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f4e0
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f588
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f630
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f6d8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f780
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f828
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f8d0
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7f978
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7fa20
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7fac8
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7fb70
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7fc18
+Log: Creating MsGestureEvent Count
+MsGestureEvent @ 03c7fcc0
+Log: Creating MsGestureEvent Count
+Log: Creating MsGestureEvent Completed
+Log: Destroying MsGestureEvent
+Log: Destroying MsGestureEvent Count
+Log: Destroying MsGestureEvent Count
+Log: Collecting Garbage
+Free @ 027f8258
+Free @ 004567a0
+Free @ 00456788
+Free @ 00449930
+Free @ 00456a38
+Free @ 03c7fc18
+Free @ 03c53590
+Free @ 0346d090
+Free @ 03c91c88
+Free @ 03c8a988
+Free @ 03c23908
+Free @ 0042d850
+Log: Collecting Garbage Completed
+Log: Destroying MsGestureEvent Completed
+Log: Reallocating MsGestureEvent
+MsGestureEvent @ 03c7fc18
+Log: Reallocating MsGestureEvent Count
+Log: Reallocating MsGestureEvent Completed
+
+
+Note: If you see the allocation addresses of MsGestureEvent,
+we see that the it belonged to Free List. We can also see that
+we successfully freed the desired object and re-allocated it.
+
+But this will not be the case when Memory Protector is enabled.
+We will see this by enabling Memory Protector by using the registry
+file provided
+---------------------------------------------------------
