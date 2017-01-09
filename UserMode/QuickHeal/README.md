@@ -37,8 +37,7 @@ Products
 Disclosure Timeline
 -------------------
  * 09 June 2016 – Reported to vendor
- * 11 June 2016 – Received acknowledgement from vendor
- * 14 June 2016 – Patch released
+ * 11 June 2016 – Received acknowledgement from vendor & Patch released
 
 
 Author
