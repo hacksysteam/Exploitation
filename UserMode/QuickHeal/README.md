@@ -1,6 +1,6 @@
 QuickHeal
 =========
-CVE-2016-XXXX for Quick Heal Antivirus
+CVE-2017-5005 for Quick Heal Antivirus
 
 
 Advisory
